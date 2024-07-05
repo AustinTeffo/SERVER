@@ -12,7 +12,7 @@
 	<artifactId>Server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>SchoolManagement</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Spring boot server</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>
@@ -39,6 +39,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>Server</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
