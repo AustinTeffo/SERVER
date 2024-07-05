@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management Frontend</title>
+</head>
+<body>
+    <style>
+       
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #d6b4b4;
+        }
+
+        .delete-section {
+    margin-bottom: 20px;
+  }
+  .delete-section label {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  .delete-section input[type="text"] {
+    padding: 5px;
+    font-size: 16px;
+    width: 150px;
+    margin-right: 10px;
+  }
+  .delete-section button {
+    padding: 8px 12px;
+    font-size: 16px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  .delete-section button:hover {
+    background-color: #d32f2f;
+  }
+    </style>
+
+    <div>
+        <textarea placeholder="Name" id="nameTextBox"></textarea>
+        <textarea placeholder="Surname" id="surnameTextBox"></textarea>
+        <textarea placeholder="Age" id="ageTextBox"></textarea>
+        <textarea placeholder="Level" id="levelTextBox"></textarea>
+        <textarea placeholder="Balance" id="BalanceTextBox"></textarea>
+        <button  id="Submit" onclick="addStudent()">Submit Button</button>
+    </div>
+<table id="studentTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Age</th>
+            <th>Level</th>
+            <th>Balance <button></button></th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        <!-- Table rows will be dynamically added here -->
+    </tbody>
+</table>
+<div id="message"></div>
+<div>
+<button onclick="getAllStudents()">Refresh Table</button>
+</div>
+<section class="delete-section">
+    <label for="delete-id">Enter ID:</label>
+    <input type="text" id="delete-id" placeholder="ID...">
+    <button onclick="deleteItem()">Delete Item</button>
+  </section>
+
+
+
+
+<script>
+    getAllStudents();
+    //function to get all
+    function getAllStudents(){
+       
+
+    fetch('http://localhost:8081/getAllStudents')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('tableBody');
+
+            // Iterate over each user object and create a table row
+            data.forEach(user => {
+                if(isInTable(user.id)){
+                let row = tableBody.insertRow();
+                row.insertCell(0).textContent = user.id;
+                row.insertCell(1).textContent = user.name;
+                row.insertCell(2).textContent = user.surname;
+                row.insertCell(3).textContent = user.age;
+                row.insertCell(4).textContent = user.level;
+                row.insertCell(5).textContent = user.balance;}
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+        });
+    
+    }
+
+        function addStudent(){
+            let names = document.getElementById("nameTextBox").value;
+            let surnames = document.getElementById("surnameTextBox").value;
+            let ages = document.getElementById("ageTextBox").value;
+            let levels = document.getElementById("levelTextBox").value;
+            let balances = document.getElementById("BalanceTextBox").value;
+            
+
+            // Example data to send to the API
+const postData = {
+    name: names,
+    surname: surnames,
+    age: ages,
+    level: levels,
+    balance: balances
+};
+
+// URL of the API endpoint where you want to post the data
+const apiUrl = 'http://localhost:8081/saveStudent';
+
+// Options for the fetch request
+const options = {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json', // Specify content type as JSON
+    },
+    body: JSON.stringify(postData) // Convert JS object to JSON string
+};
+
+// Make the POST request using fetch
+fetch(apiUrl, options)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // Parse response body as JSON
+    })
+    .then(data => {
+        console.log('Success:', data); // Handle success response
+    })
+    .catch(error => {
+        console.error('Error:', error); // Handle errors
+    });
+
+    getAllStudents();
+
+        }
+
+    function isInTable(id){
+        //table.rows[i].cells[0].textContent
+        const tableBody = document.getElementById('tableBody');
+        for(let i = 0;i<tableBody.rows.length;i++){
+            if(tableBody.rows[i].cells[0].textContent==id){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    //to delete items 
+
+    function deleteItem(){
+
+const options = {
+method: 'DELETE',
+headers: {
+'Content-Type': 'application/json', // Specify content type as JSON
+}
+};
+
+const tableBody = document.getElementById('tableBody');
+let id = document.getElementById('delete-id').value;
+const apiUrl = 'http://localhost:8081/deleteStudent/'+id;
+fetch(apiUrl,options)
+.then(response => response.json())
+.then(data => {
+
+ const tableBody = document.getElementById('tableBody');
+for(let i = 0;i<tableBody.rows.length;i++){
+    if(tableBody.rows[i].cells[0].textContent==id){
+       tableBody.remove()
+    }
+}
+   
+})
+.catch(error => {
+    console.error('Error deleting user data:', error);
+});
+
+
+
+}
+</script>    
+
+
+</body>
+</html>
